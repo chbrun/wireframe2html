@@ -1,1 +1,1 @@
-<p>PAragraphe</p>
+<p>{{ ref_27.text or 'Lorem ipsum' }}</p>

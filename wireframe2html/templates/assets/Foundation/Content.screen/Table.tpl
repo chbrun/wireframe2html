@@ -1,1 +1,18 @@
-<table> <thead> <tr> <th width="200">Table Header</th> <th>Table Header</th> <th width="150">Table Header</th> <th width="150">Table Header</th> </tr> </thead> <tbody> <tr> <td>Content Goes Here</td> <td>This is longer content Donec id elit non mi porta gravida at eget metus.</td> <td>Content Goes Here</td> <td>Content Goes Here</td> </tr> <tr> <td>Content Goes Here</td> <td>This is longer Content Goes Here Donec id elit non mi porta gravida at eget metus.</td> <td>Content Goes Here</td> <td>Content Goes Here</td> </tr> <tr> <td>Content Goes Here</td> <td>This is longer Content Goes Here Donec id elit non mi porta gravida at eget metus.</td> <td>Content Goes Here</td> <td>Content Goes Here</td> </tr> </tbody> </table>
+<table >
+    <thead>
+        <tr> 
+            {% for header in ref_34.text | get_table_header %}
+            <th style="padding: 0.3rem 0.625rem;">{{ header|replace('*','') }}</th>
+            {% endfor %}
+        </tr> 
+    </thead> 
+    <tbody> 
+       {% for ligne in ref_34.text | get_table_lignes %}
+        <tr> 
+           {% for value in ligne | get_table_ligne_value %}
+                <td style="padding: 0.3rem 0.625rem;">{{ value }}</td> 
+           {% endfor %}
+        </tr> 
+        {% endfor %}
+    </tbody> 
+</table>

@@ -10,7 +10,7 @@
 
               <script src="templates/js/vendor/modernizr.js"></script>
 </head>
-<body>
+<body style="font-size:12px;">
   {{ content }}
 </body>
 </html>
