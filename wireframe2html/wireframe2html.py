@@ -41,7 +41,7 @@ if __name__ == '__main__':
     (options, args) = parser.parse_args()
 
     # Chargement de l'environnement pour les templates
-    env = Environment(loader = PackageLoader('screen2html', 'templates'))
+    env = Environment(loader = PackageLoader('wireframe2html', 'templates'))
     env.filters['get_table_header'] = get_table_header
     env.filters['get_table_lignes'] = get_table_lignes
     env.filters['get_table_ligne_value'] = get_table_ligne_value
@@ -76,7 +76,8 @@ if __name__ == '__main__':
                         print overrides
                 for screen in screens:
                     if screen.nodeName == u'screen':
-                        subscreen = env.get_template('%s.tpl' % screen.getAttribute('href').replace("#","/"))
+                        screen_path = screen.getAttribute('href').replace("#","/").replace('&','_').replace("%20","")
+                        subscreen = env.get_template('%s.tpl' % screen_path)
                         subcontent = subscreen.render(overrides)
 
             subtemplate = env.get_template('%s.tpl' % template_path.replace(":","/"))
