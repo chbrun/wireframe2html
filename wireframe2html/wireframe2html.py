@@ -31,12 +31,26 @@ def hasoverride(element):
           retour = True
     return retour
 
+def handleModelScreen(document):
+    widgets = document.childNodes
+    handleWidgets(widgets)
+
+def handleWidgets(widgets):
+    print widgets
+    for widget in widgets:
+        if widget.nodeName == u'widgets':
+            print widget.getAttribute('xsi:type')
+
 if __name__ == '__main__':
     parser = OptionParser()
     parser.add_option("-i", "--input", dest="inputfile",
             help="Screen Input File", metavar="FILE")
     parser.add_option("-s", "--screen", dest="inputscreen",
             help="Screen Input", metavar="Name")
+    parser.add_option("-w", "--workspace", dest="workspace",
+            help="Wireframesketcher workspace", metavar="Workspace")
+    parser.add_option("-o", "--output", dest="outputDir",
+            help="Output Dir", metavar="Directory")
 
     (options, args) = parser.parse_args()
 
@@ -54,6 +68,7 @@ if __name__ == '__main__':
 
     content = ''
     root = screen.childNodes[0]
+    handleModelScreen(root)
     widgets = root.childNodes
     for widget in widgets:
         if widget.nodeName == u'widgets' :
