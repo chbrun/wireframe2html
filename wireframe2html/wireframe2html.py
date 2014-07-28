@@ -1,22 +1,32 @@
+import re
 from xml.dom.minidom import parse
 from optparse import OptionParser
 from jinja2 import Environment, PackageLoader
 
+
+def mreplace(replacements, text):
+    regex = re.compile("(%s)" % "|".join(map(re.escape, replacements.keys())))
+    return regex.sub(lambda mo: replacements[mo.string[mo.start():mo.end()]], text)
+
+
 def attribute2param(element):
-    params={}
+    params = {}
     attributes = element.attributes.items()
     for attribute in attributes:
         params[attribute[0]] = attribute[1]
     return params
 
+
 def get_table_header(chaine):
     header = chaine.split("\n")[0]
-    retour =  header.split(',')
+    retour = header.split(',')
     return retour
+
 
 def get_table_lignes(chaine):
     lignes = chaine.split("\n")[1:]
     return lignes
+
 
 def get_table_ligne_value(chaine):
     values = chaine.split(',')
@@ -27,19 +37,35 @@ def hasoverride(element):
     childs = element.childNodes
     retour = False
     for child in childs:
-      if child.nodeName == u'overrides':
-          retour = True
+        if child.nodeName == u'overrides':
+            retour = True
     return retour
+
 
 def handleModelScreen(document):
     widgets = document.childNodes
-    handleWidgets(widgets)
-
-def handleWidgets(widgets):
-    print widgets
     for widget in widgets:
         if widget.nodeName == u'widgets':
-            print widget.getAttribute('xsi:type')
+            handleWidgets(widget)
+
+
+def handleWidgets(widget):
+    overrides = {}
+    if widget.getAttribute('xsi:type') == 'model:Master':
+        if hasoverride(widget):
+            overrides = handleOverrides(widget.getElementsByTagName('overrides'))
+        handleScreen(widget.getElementsByTagName('screen'))
+
+def handleScreen(screen):
+    print screen
+
+def handleOverrides(overrides):
+    subWidgets = overrides.getElementsByTagName('widgets')
+    for subWidget in subWidgets:
+        handleWidgetOverrides(subWidget)
+
+def handleWidgetOverrides(widgetoverride):
+    print widgetoverride
 
 if __name__ == '__main__':
     parser = OptionParser()
@@ -55,7 +81,7 @@ if __name__ == '__main__':
     (options, args) = parser.parse_args()
 
     # Chargement de l'environnement pour les templates
-    env = Environment(loader = PackageLoader('wireframe2html', 'templates'))
+    env = Environment(loader=PackageLoader('wireframe2html', 'templates'))
     env.filters['get_table_header'] = get_table_header
     env.filters['get_table_lignes'] = get_table_lignes
     env.filters['get_table_ligne_value'] = get_table_ligne_value
@@ -71,12 +97,12 @@ if __name__ == '__main__':
     handleModelScreen(root)
     widgets = root.childNodes
     for widget in widgets:
-        if widget.nodeName == u'widgets' :
-            subcontent=''
+        if widget.nodeName == u'widgets':
+            subcontent = ''
             template_path = widget.getAttribute('xsi:type')
             if template_path == 'model:Master':
                 screens = widget.childNodes
-                overrides={}
+                overrides = {}
                 if hasoverride(widget):
                     subwidgets = widget.getElementsByTagName('widgets')
                     for subwidget in subwidgets:
@@ -86,20 +112,18 @@ if __name__ == '__main__':
                             for subitem in subitems:
                                 subelements[subitem.getAttribute('ref')] = attribute2param(subitem)
                         params = attribute2param(subwidget)
-                        params['subitems']=subelements
-                        overrides['ref_%s' % subwidget.getAttribute('ref')] = params 
+                        params['subitems'] = subelements
+                        overrides['ref_%s' % subwidget.getAttribute('ref')] = params
                         print overrides
                 for screen in screens:
                     if screen.nodeName == u'screen':
-                        screen_path = screen.getAttribute('href').replace("#","/").replace('&','_').replace("%20","")
+                        screen_path = screen.getAttribute('href').replace("#", "/").replace('&', '_').replace("%20", "")
                         subscreen = env.get_template('%s.tpl' % screen_path)
                         subcontent = subscreen.render(overrides)
 
-            subtemplate = env.get_template('%s.tpl' % template_path.replace(":","/"))
+            subtemplate = env.get_template('%s.tpl' % template_path.replace(":", "/"))
             content += subtemplate.render(
                     attribute2param(widget),
                     content=subcontent
                        )
-
-
     htmlscreen.write(page.render(page_title=screen_name, content=content))
