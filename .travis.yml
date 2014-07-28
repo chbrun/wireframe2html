@@ -1,0 +1,11 @@
+language: python
+python:
+    - "2.7"
+install:
+    - pip install -r requirements.txt
+    - pip install coveralls
+script:
+    - python -m unittest discover
+    - coverage run --rcfile=.coveragerc -m unittest discover wireframe2html 
+after_success:
+    - coveralls --rcfile=.coveragerc
