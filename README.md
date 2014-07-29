@@ -24,4 +24,14 @@ Alpha version : only foundation widgets
 python wireframe2html.py -s [screenName]
 ```
 
+## Examples ##
+There are 2 examples in examples directory :
+  - Homepage.screen : simple hompage
+  - Projects_list.screen : simple page with table
 
+```bash
+python wireframe2html.py -s Homepage
+python wireframe2html.py -s Projects_list
+```
+
+Then open Homepage.html with your browser, and clic on Projects in TopBar

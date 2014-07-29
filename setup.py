@@ -9,7 +9,7 @@ with open(path.join(here, 'DESCRIPTION.rst'), encoding='utf-8') as f:
 
 setup(
     name    = 'wireframe2html',
-    version = '0.1',
+    version = '0.2',
     author = "Christophe Brun",
     author_email = "christophe.brun.cl194@gadz.org",
     description = ("Convert screen from Wireframesketcher to html "),
