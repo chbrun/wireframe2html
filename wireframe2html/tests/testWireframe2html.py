@@ -2,6 +2,7 @@ import unittest
 import mock
 from wireframe2html import *
 from xml.dom.minidom import Element
+import jinja2
 
 class TestWireframe2html(unittest.TestCase):
 
@@ -52,39 +53,77 @@ class TestWireframe2html(unittest.TestCase):
         domDocument.appendChild(child)
         childlist = []
         childlist.append(child)
-        handleModelScreen(domDocument)
+        handleModelScreen(domDocument, '')
         mock_handleWidgets.assert_has_call([
             mock.call(childlist)
             ])
 
     @mock.patch('wireframe2html.handleScreen')
     @mock.patch('wireframe2html.handleOverrides')
-    def test_handleWidgets(self, mock_handleScreen, mock_handleOverrieds):
+    @mock.patch('jinja2.Environment.get_template')
+    def test_handleWidgets(self, mock_handleScreen, mock_handleOverrides,mock_get_template):
         # Sans overrides
         domDocument = Element(u'widgets')
         domDocument.setAttribute('xsi:type','model:Master')
         child = Element('screen')
         domDocument.appendChild(child)
-        handleWidgets(domDocument)
+        handleWidgets(domDocument, jinja2.Environment())
         mock_handleScreen.assert_has_call([
             mock.call([child,])
+            ])
+        mock_get_template.assert_has_call([
+            mock.call()
             ])
         # Avec overrides
         child = Element('overrides')
         domDocument.appendChild(child)
-        handleWidgets(domDocument)
-        mock_handleOverrieds.assert_has_call([
+        handleWidgets(domDocument, jinja2.Environment())
+        mock_handleOverrides.assert_has_call([
             mock.call([child,])
             ])
+
+
+    @mock.patch('jinja2.Environment.get_template')
+    def test_handleScreen(self, mock_get_template):
+        element = Element('screen')
+        handleScreen([element,], jinja2.Environment(), None)
+        mock_get_template.assert_has_call([
+            mock.call()
+            ])
+
 
     @mock.patch('wireframe2html.handleWidgetOverrides')
     def test_handleOverrides(self, mock_handleWidgetOverrides):
         domDocument = Element('overrides')
         child = Element('widgets')
         domDocument.appendChild(child)
-        handleOverrides(domDocument)
+        handleOverrides([domDocument,])
         mock_handleWidgetOverrides.assert_has_call([
             mock.call(child)
             ])
+
+    @mock.patch('wireframe2html.attribute2param')
+    @mock.patch('wireframe2html.handleItems')
+    def test_handleWidgetOverrides(self, mock_attribute2param, mock_handleItems):
+        element = Element('test')
+        handleWidgetOverrides(element)
+        mock_attribute2param.assert_has_call([
+            mock.call(element)
+            ])
+        mock_handleItems.assert_has_call([
+            mock.call(element)
+            ])
+
+    @mock.patch('wireframe2html.attribute2param')
+    def test_handleItems(self, mock_attribute2param):
+        element = Element('test')
+        child = Element('items')
+        element.appendChild(child)
+        handleItems(element)
+        mock_attribute2param.assert_has_call([
+            mock.call(element)
+            ])
+
+
 
 
